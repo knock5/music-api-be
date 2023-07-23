@@ -1,6 +1,6 @@
 const ClientError = require('../../exceptions/ClientError');
 
-class AlbumService {
+class AlbumHandler {
   constructor(service, validator) {
     this._service = service;
     this._validator = validator;
@@ -14,7 +14,6 @@ class AlbumService {
 
   async postAlbumHandler(request, h) {
     try {
-      this._validator.validateAlbumPayload(request.params);
       const { name, year } = request.payload;
       const albumId = await this._service.addNewAlbum({ name, year });
       const response = h.response({
@@ -168,4 +167,4 @@ class AlbumService {
   }
 }
 
-module.exports = AlbumService;
+module.exports = AlbumHandler;

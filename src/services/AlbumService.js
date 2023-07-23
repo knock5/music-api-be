@@ -24,9 +24,7 @@ class AlbumService {
   }
 
   async getAlbumsAll() {
-    const statement = {
-      text: 'SELECT * FROM albums',
-    };
+    const statement = 'SELECT * FROM albums';
     const result = await this._pool.query(statement);
 
     if (!result.rows.length) {
