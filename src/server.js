@@ -9,6 +9,7 @@ const SongsService = require('./services/SongService');
 // Validator
 const AlbumValidator = require('./validator/albums');
 const SongsValidator = require('./validator/songs');
+// Error handling
 const ClientError = require('./exceptions/ClientError');
 
 const init = async () => {
