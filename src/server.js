@@ -1,5 +1,6 @@
 require('dotenv').config();
 const Hapi = require('@hapi/hapi');
+<<<<<<< HEAD
 // Plugins
 const albums = require('./api/albums');
 const songs = require('./api/songs');
@@ -11,10 +12,20 @@ const AlbumValidator = require('./validator/albums');
 const SongsValidator = require('./validator/songs');
 // Error handling
 const ClientError = require('./exceptions/ClientError');
+=======
+
+// plugins
+const albums = require('./api/albums');
+const songs = require('./api/songs');
+
+// services
+const AlbumService = require('./services/AlbumService');
+const SongService = require('./services/SongService');
+>>>>>>> parent of 92009f7 (add: create validator and fixing code)
 
 const init = async () => {
-  const songsService = new SongsService();
-  const albumsService = new AlbumsService();
+  const albumService = new AlbumService();
+  const songService = new SongService();
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -28,18 +39,12 @@ const init = async () => {
 
   await server.register({
     plugin: songs,
-    options: {
-      service: songsService,
-      validator: SongsValidator,
-    },
+    service: songService,
   });
 
   await server.register({
     plugin: albums,
-    options: {
-      service: albumsService,
-      validator: AlbumValidator,
-    },
+    service: albumService,
   });
 
   server.ext('onPreResponse', (request, h) => {
