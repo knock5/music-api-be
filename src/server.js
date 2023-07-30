@@ -61,7 +61,7 @@ const init = async () => {
       }
       // penanganan server error sesuai kebutuhan
       const newResponse = h.response({
-        status: 'error',
+        status: 'fail',
         message: 'Maaf, terjadi kegagalan pada server kami...',
       });
       newResponse.code(500);
