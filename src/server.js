@@ -1,14 +1,15 @@
 require('dotenv').config();
-
 const Hapi = require('@hapi/hapi');
-
+// Plugins
 const albums = require('./api/albums');
-const AlbumsService = require('./services/AlbumServices');
-const AlbumValidator = require('./validator/albums');
-
 const songs = require('./api/songs');
+// Services
+const AlbumsService = require('./services/AlbumServices');
 const SongsService = require('./services/SongService');
+// Validator
+const AlbumValidator = require('./validator/albums');
 const SongsValidator = require('./validator/songs');
+const ClientError = require('./exceptions/ClientError');
 
 const init = async () => {
   const songsService = new SongsService();
@@ -38,6 +39,36 @@ const init = async () => {
       service: albumsService,
       validator: AlbumValidator,
     },
+  });
+
+  server.ext('onPreResponse', (request, h) => {
+    // mendapatkan konteks response dari request
+    const { response } = request;
+
+    if (response instanceof Error) {
+      // Penanganan client error internal
+      if (response instanceof ClientError) {
+        const newResponse = h.response({
+          status: 'fail',
+          message: response.message,
+        });
+        newResponse.code(response.statusCode);
+        return newResponse;
+      }
+      // mempertahankan penanganan client error oleh hapi secara native
+      if (!response.isServer) {
+        return h.continue;
+      }
+      // penanganan server error sesuai kebutuhan
+      const newResponse = h.response({
+        status: 'error',
+        message: 'Maaf, terjadi kegagalan pada server kami...',
+      });
+      newResponse.code(500);
+      return newResponse;
+    }
+    // Jika bukan error lanjutkan dengan response sebelumnya (tanpa terintervensi)
+    return h.continue;
   });
 
   await server.start();
