@@ -29,7 +29,6 @@ class AlbumService {
       text: 'SELECT * FROM albums WHERE id = $1',
       values: [id],
     };
-
     const result = await this._pool.query(query);
 
     if (!result.rows.length) {
@@ -41,13 +40,11 @@ class AlbumService {
       text: 'SELECT id, title, performer FROM songs WHERE id = $1',
       values: [id],
     };
-
     const songs = await this._pool.query(songsQuery);
 
     if (songs.rows.length > 0) {
       album.songs = songs.rows;
     }
-
     return album;
   }
 
