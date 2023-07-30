@@ -1,15 +1,18 @@
 require('dotenv').config();
+
 const Hapi = require('@hapi/hapi');
-// plugins
+
 const albums = require('./api/albums');
+const AlbumsService = require('./services/AlbumServices');
+const AlbumValidator = require('./validator/albums');
+
 const songs = require('./api/songs');
-// services
-const AlbumService = require('./services/AlbumServices');
-const SongService = require('./services/SongService');
+const SongsService = require('./services/SongService');
+const SongsValidator = require('./validator/songs');
 
 const init = async () => {
-  const albumService = new AlbumService();
-  const songService = new SongService();
+  const songsService = new SongsService();
+  const albumsService = new AlbumsService();
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -23,12 +26,18 @@ const init = async () => {
 
   await server.register({
     plugin: songs,
-    service: songService,
+    options: {
+      service: songsService,
+      validator: SongsValidator,
+    },
   });
 
   await server.register({
     plugin: albums,
-    service: albumService,
+    options: {
+      service: albumsService,
+      validator: AlbumValidator,
+    },
   });
 
   await server.start();

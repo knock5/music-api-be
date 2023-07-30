@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const InvariantError = require('../exceptions/InvariantError');
@@ -15,10 +14,13 @@ class AlbumService {
       text: 'INSERT INTO albums VALUES($1, $2, $3) RETURNING id',
       values: [id, name, year],
     };
+
     const result = await this._pool.query(query);
+
     if (!result.rows.length) {
       throw new InvariantError('Album gagal ditambahkan');
     }
+
     return result.rows[0].id;
   }
 
@@ -27,10 +29,11 @@ class AlbumService {
       text: 'SELECT * FROM albums WHERE id = $1',
       values: [id],
     };
+
     const result = await this._pool.query(query);
 
     if (!result.rows.length) {
-      throw new NotFoundError('Album tidak ditemukan');
+      throw new NotFoundError('Album id tidak ditemukan');
     }
 
     const album = result.rows[0];
@@ -44,6 +47,7 @@ class AlbumService {
     if (songs.rows.length > 0) {
       album.songs = songs.rows;
     }
+
     return album;
   }
 
@@ -56,7 +60,7 @@ class AlbumService {
     const result = await this._pool.query(query);
 
     if (!result.rows.length) {
-      throw new NotFoundError('Album tidak ditemukan');
+      throw new NotFoundError('Album id tidak ditemukan');
     }
   }
 
@@ -69,7 +73,7 @@ class AlbumService {
     const result = await this._pool.query(query);
 
     if (!result.rows.length) {
-      throw new NotFoundError('Album tidak ditemukan');
+      throw new NotFoundError('Album id tidak ditemukan');
     }
   }
 }

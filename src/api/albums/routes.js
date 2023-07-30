@@ -17,7 +17,7 @@ const routes = (handler) => [
   {
     method: 'PUT',
     path: '/album/{id}',
-    handler: (request, h) => handler.updateAlbumByIdHandler(request, h),
+    handler: (request, h) => handler.editAlbumByIdHandler(request, h),
   },
   {
     method: 'DELETE',
