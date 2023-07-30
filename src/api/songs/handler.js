@@ -1,6 +1,6 @@
 const ClientError = require('../../exceptions/ClientError');
 
-class SongHandler {
+class SongsHandler {
   constructor(service, validator) {
     this._service = service;
     this._validator = validator;
@@ -8,28 +8,32 @@ class SongHandler {
     this.postSongHandler = this.postSongHandler.bind(this);
     this.getSongsHandler = this.getSongsHandler.bind(this);
     this.getSongByIdHandler = this.getSongByIdHandler.bind(this);
-    this.updateSongByIdHandler = this.updateSongByIdHandler.bind(this);
+    this.editSongByIdHandler = this.editSongByIdHandler.bind(this);
     this.deleteSongByIdHandler = this.deleteSongByIdHandler.bind(this);
   }
 
   async postSongHandler(request, h) {
     try {
+      this._validator.validateSongPayload(request.payload);
       const {
-        title, year, performer, genre, duartion,
+        title, year, performer, genre, duration,
       } = request.payload;
-      const songId = await this._service.addNewSong({
-        title, year, performer, genre, duartion,
+
+      const songId = await this._service.addSong({
+        title, year, performer, genre, duration,
       });
+
       const response = h.response({
         status: 'success',
-        message: 'Lagu baru berhasil ditambahkan',
+        message: 'Lagu berhasil ditambahkan',
         data: {
           songId,
         },
       });
       response.code(201);
       return response;
-    } catch (error) {
+    } catch
+    (error) {
       if (error instanceof ClientError) {
         const response = h.response({
           status: 'fail',
@@ -38,18 +42,19 @@ class SongHandler {
         response.code(error.statusCode);
         return response;
       }
-      // Server ERROR!
+      // Server Error
       const response = h.response({
-        status: 'fail',
+        status: 'error',
         message: 'Maaf, terjadi kesalahan pada server kami...',
       });
       response.code(500);
+      console.error(error);
       return response;
     }
   }
 
   async getSongsHandler() {
-    const songs = await this._service.getSongsAll();
+    const songs = await this._service.getAllSongs();
     return {
       status: 'success',
       data: {
@@ -62,12 +67,14 @@ class SongHandler {
     try {
       const { id } = request.params;
       const song = await this._service.getSong(id);
-      return {
+      const response = h.response({
         status: 'success',
         data: {
           song,
         },
-      };
+      });
+      response.code(200);
+      return response;
     } catch (error) {
       if (error instanceof ClientError) {
         const response = h.response({
@@ -77,9 +84,9 @@ class SongHandler {
         response.code(error.statusCode);
         return response;
       }
-      // Server ERROR!
+      // Server Error
       const response = h.response({
-        status: 'fail',
+        status: 'error',
         message: 'Maaf, terjadi kesalahan pada server kami...',
       });
       response.code(500);
@@ -88,10 +95,11 @@ class SongHandler {
     }
   }
 
-  async updateSongByIdHandler(request, h) {
+  async editSongByIdHandler(request, h) {
     try {
+      this._validator.validateSongPayload(request.payload);
       const { id } = request.params;
-      await this._service.updateSong(id, request.payload);
+      await this._service.editSong(id, request.payload);
       return {
         status: 'success',
         message: 'Lagu berhasil diperbarui',
@@ -105,9 +113,9 @@ class SongHandler {
         response.code(error.statusCode);
         return response;
       }
-      // Server ERROR!
+      // Server Error
       const response = h.response({
-        status: 'fail',
+        status: 'error',
         message: 'Maaf, terjadi kesalahan pada server kami...',
       });
       response.code(500);
@@ -133,9 +141,9 @@ class SongHandler {
         response.code(error.statusCode);
         return response;
       }
-      // Server ERROR!
+      // Server Error
       const response = h.response({
-        status: 'fail',
+        status: 'error',
         message: 'Maaf, terjadi kesalahan pada server kami...',
       });
       response.code(500);
@@ -145,4 +153,4 @@ class SongHandler {
   }
 }
 
-module.exports = SongHandler;
+module.exports = SongsHandler;
