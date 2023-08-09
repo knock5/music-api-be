@@ -28,6 +28,15 @@ const mapDBToModelSongDetail = ({
   updatedAt: updated_at,
 });
 
+const mapDBToModelUsers = ({
+  id, username, password, fullname,
+}) => ({
+  id,
+  username,
+  password,
+  fullname,
+});
+
 const errorHandler = (error, h) => {
   if (error instanceof ClientError) {
     const response = h.response({
@@ -48,4 +57,6 @@ const errorHandler = (error, h) => {
   return response;
 };
 
-module.exports = { mapDBToModelSong, mapDBToModelSongDetail, errorHandler };
+module.exports = {
+  mapDBToModelSong, mapDBToModelSongDetail, mapDBToModelUsers, errorHandler,
+};
