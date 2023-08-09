@@ -5,8 +5,9 @@ class UsersHandler {
     this._service = service;
     this._validator = validator;
 
-    const postUserHandler = this.postUserHandler.bind(this);
-    const getUserByIdHandler = this.getUserByIdHandler.bind(this);
+    this.postUserHandler = this.postUserHandler.bind(this);
+    this.getUserByIdHandler = this.getUserByIdHandler.bind(this);
+    this.getUsersHandler = this.getUsersHandler.bind(this);
   }
 
   async postUserHandler(request, h) {
@@ -43,6 +44,16 @@ class UsersHandler {
       console.error(error);
       return response;
     }
+  }
+
+  async getUsersHandler() {
+    const users = await this._service.getAllUsers();
+    return {
+      status: 'success',
+      data: {
+        users,
+      },
+    };
   }
 
   async getUserByIdHandler(request, h) {

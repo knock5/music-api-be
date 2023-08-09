@@ -3,6 +3,7 @@ const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 const InvariantError = require('../exceptions/InvariantError');
 const NotFoundError = require('../exceptions/NotFoundError');
+const { mapDBToModelUsers } = require('../utils/index');
 
 class UsersServices {
   constructor() {
@@ -15,17 +16,12 @@ class UsersServices {
     const id = `user-${nanoid(16)}`;
     const hashedPassword = await bcrypt.hash(password, 10);
     const query = {
-      text: 'INSERT INTO users VALUES($1, $2, $3, $4) RETURNING id',
+      text: 'INSERT INTO users VALUES($1, $2, $3, $4) RETURNING id, username, password, fullname',
       values: [id, username, hashedPassword, fullname],
     };
 
     const result = await this._pool.query(query);
-
-    if (!result.rows.length) {
-      throw new InvariantError('User gagal ditambahkan');
-    }
-
-    return result.rows[0].id;
+    return result.rows[0];
   }
 
   async verifyNewUsername(username) {
@@ -39,6 +35,8 @@ class UsersServices {
     if (result.rows.length > 0) {
       throw new InvariantError('Gagal menambah user. Username sudah digunakan');
     }
+
+    return result.rows[0].id;
   }
 
   async getUserById(userId) {
@@ -54,6 +52,12 @@ class UsersServices {
     }
 
     return result.rows[0];
+  }
+
+  async getAllUsers() {
+    const query = 'SELECT id, username, password, fullname FROM users';
+    const users = await this._pool.query(query);
+    return users.rows.map(mapDBToModelUsers);
   }
 }
 
