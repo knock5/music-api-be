@@ -1,5 +1,6 @@
 require('dotenv').config();
 const Hapi = require('@hapi/hapi');
+const Jwt = require('@hapi/jwt');
 const TokenManager = require('./tokenize/TokenManager');
 
 // plugins
@@ -34,6 +35,30 @@ const init = async () => {
         origin: ['*'],
       },
     },
+  });
+
+  // Register plugin eksternal
+  await server.register([
+    {
+      plugin: Jwt,
+    },
+  ]);
+
+  // Mendefinisikan strategI autentikasi JWT
+  server.auth.strategy('openmusic_jwt', 'jwt', {
+    keys: process.env.ACCESS_TOKEN_KEY,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+    },
+    validate: (artifacts) => ({
+      isValid: true,
+      credentials: {
+        id: artifacts.decode.payload.id,
+      },
+    }),
   });
 
   await server.register([
