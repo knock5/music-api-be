@@ -5,6 +5,7 @@ exports.up = (pgm) => {
     id: {
       type: 'VARCHAR(50)',
       primaryKey: true,
+      notNull: true,
     },
     username: {
       type: 'TEXT',
