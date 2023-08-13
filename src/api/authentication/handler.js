@@ -2,10 +2,10 @@ const ClientError = require('../../exceptions/ClientError');
 
 class AuthenticationHandler {
   constructor(authenticationService, usersService, tokenManager, validator) {
-    this.authenticationService = authenticationService;
-    this.usersService = usersService;
-    this.tokenManager = tokenManager;
-    this.validator = validator;
+    this._authenticationService = authenticationService;
+    this._usersService = usersService;
+    this._tokenManager = tokenManager;
+    this._validator = validator;
 
     this.postAuthenticationHandler = this.postAuthenticationHandler.bind(this);
     this.putAuthenticationHandler = this.putAuthenticationHandler.bind(this);
@@ -14,6 +14,7 @@ class AuthenticationHandler {
 
   async postAuthenticationHandler(request, h) {
     try {
+      this._validator.validatePostAuthenticationPayload(request.payload);
       const { username, password } = request.payload;
       const id = await this.usersService.verifyUserCredential(username, password);
       const accessToken = this.tokenManager.generateAccessToken({ id });
@@ -52,6 +53,7 @@ class AuthenticationHandler {
 
   async putAuthenticationHandler(request, h) {
     try {
+      this._validator.validatePutAuthenticationPayload(request.payload);
       const { refreshToken } = request.payload;
       await this.authenticationService.verifyRefreshToken(refreshToken);
       const { id } = this.tokenManager.verifyRefreshToken(refreshToken);
@@ -86,6 +88,7 @@ class AuthenticationHandler {
 
   async delAuthenticationHandler(request, h) {
     try {
+      this._validator.validateDelAuthenticationPayload(request.payload);
       const { refreshToken } = request.payload;
       await this.authenticationService.verifyRefreshToken(refreshToken);
       await this.authenticationService.delRefreshToken(refreshToken);
