@@ -9,11 +9,11 @@ class PlaylistService {
     this._collaboratorService = collaboratorService;
   }
 
-  async addPlaylist({ name, year }) {
+  async addPlaylist({ name, owner }) {
     const id = `playlist-${nanoid(16)}`;
     const query = {
-      text: 'SELECT INTO playlist VALUES($1, $2, $3) RETURNING id',
-      values: [id, name, year],
+      text: 'INSERT INTO playlist VALUES($1, $2, $3) RETURNING id',
+      values: [id, name, owner],
     };
     const result = await this._pool.query(query);
 
