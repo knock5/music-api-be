@@ -1,11 +1,9 @@
-/* eslint-disable camelcase */
-
 exports.shorthands = undefined;
 
 exports.up = (pgm) => {
   pgm.createTable('playlists', {
     id: {
-      type: 'TEXT',
+      type: 'VARCHAR(50)',
       primaryKey: true,
       notNull: true,
     },
@@ -16,6 +14,8 @@ exports.up = (pgm) => {
     owner: {
       type: 'TEXT',
       notNull: true,
+      refrences: 'user(id)',
+      onDelete: 'CASCADE',
     },
   });
 };
