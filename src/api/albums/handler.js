@@ -12,7 +12,7 @@ class AlbumService {
   async postAlbumHandler(request, h) {
     try {
       this._validator.validateAlbumPayload(request.payload);
-      const { name, year } = request.payload;
+      const { name = 'untitled', year } = request.payload;
       const albumId = await this._service.addAlbum({ name, year });
       const response = h.response({
         status: 'success',
@@ -34,29 +34,6 @@ class AlbumService {
         return response;
       }
 
-      // Server Error
-      const response = h.response({
-        status: 'error',
-        message: 'Maaf, terjadi kesalahan pada server kami...',
-      });
-      response.code(500);
-      console.error(error);
-      return response;
-    }
-  }
-
-  async getAlbumsHandler(request, h) {
-    try {
-      const albums = await this._service.getAllAlbums();
-      const response = h.response({
-        status: 'success',
-        data: {
-          albums,
-        },
-      });
-      response.code(200);
-      return response;
-    } catch (error) {
       // Server Error
       const response = h.response({
         status: 'error',
