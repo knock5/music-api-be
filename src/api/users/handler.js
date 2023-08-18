@@ -45,16 +45,6 @@ class UsersHandler {
     }
   }
 
-  async getUsersHandler() {
-    const users = await this._service.getAllUsers();
-    return {
-      status: 'success',
-      data: {
-        users,
-      },
-    };
-  }
-
   async getUserByIdHandler(request, h) {
     try {
       const { id } = request.params;
