@@ -15,10 +15,10 @@ class AuthenticationHandler {
     try {
       this._validator.validatePostAuthenticationPayload(request.payload);
       const { username, password } = request.payload;
-      const id = await this.usersService.verifyUserCredential(username, password);
-      const accessToken = this.tokenManager.generateAccessToken({ id });
-      const refreshToken = this.tokenManager.generateRefreshToken({ id });
-      await this.authenticationService.addRefreshToken(refreshToken);
+      const id = await this._usersService.verifyUserCredential(username, password);
+      const accessToken = this._tokenManager.generateAccessToken({ id });
+      const refreshToken = this._tokenManager.generateRefreshToken({ id });
+      await this._authenticationService.addRefreshToken(refreshToken);
 
       const response = h.response({
         status: 'success',
@@ -54,9 +54,9 @@ class AuthenticationHandler {
     try {
       this._validator.validatePutAuthenticationPayload(request.payload);
       const { refreshToken } = request.payload;
-      await this.authenticationService.verifyRefreshToken(refreshToken);
-      const { id } = this.tokenManager.verifyRefreshToken(refreshToken);
-      const accessToken = this.tokenManager.generateAccessToken({ id });
+      await this._authenticationService.verifyRefreshToken(refreshToken);
+      const { id } = this._tokenManager.verifyRefreshToken(refreshToken);
+      const accessToken = this._tokenManager.generateAccessToken({ id });
       const response = h.response({
         status: 'success',
         message: 'Akses token berhasil diperbarui',
@@ -89,8 +89,8 @@ class AuthenticationHandler {
     try {
       this._validator.validateDelAuthenticationPayload(request.payload);
       const { refreshToken } = request.payload;
-      await this.authenticationService.verifyRefreshToken(refreshToken);
-      await this.authenticationService.delRefreshToken(refreshToken);
+      await this._authenticationService.verifyRefreshToken(refreshToken);
+      await this._authenticationService.delRefreshToken(refreshToken);
       const response = h.response({
         status: 'success',
         message: 'Refresh token berhasil dihapus',
