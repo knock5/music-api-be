@@ -3,7 +3,6 @@ const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 const InvariantError = require('../exceptions/InvariantError');
 const NotFoundError = require('../exceptions/NotFoundError');
-const { mapDBToModelUsers } = require('../utils/index');
 const AuthenticationError = require('../exceptions/AuthenticationError');
 
 class UsersServices {
@@ -54,12 +53,6 @@ class UsersServices {
     }
 
     return result.rows[0];
-  }
-
-  async getAllUsers() {
-    const query = 'SELECT id, username, password, fullname FROM users';
-    const users = await this._pool.query(query);
-    return users.rows.map(mapDBToModelUsers);
   }
 
   async verifyUserCredential(username, password) {
