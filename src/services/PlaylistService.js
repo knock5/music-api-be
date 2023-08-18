@@ -51,17 +51,37 @@ class PlaylistService {
     }
   }
 
-  async getPlaylistById(id) {
+  async addSongToPlaylist(playlistId, songId) {
     const query = {
-      text: 'SELECT * FROM playlists WHERE id = $1',
-      values: [id],
+      text: 'INSERT INTO playlist_songs(playlist_id, song_id) VALUES($1, $2) RETURNING id',
+      values: [playlistId, songId],
     };
     const result = await this._pool.query(query);
-
-    if (!result.rows.length) {
-      throw new NotFoundError('Playlist id tidak ditemukan');
+    if (!result.rows[0].id) {
+      throw new InvariantError('Lagu tidak berhasil ditambahkan ke playlist');
     }
-    return result.rows[0];
+  }
+
+  async getSongInPlaylist(playlistId) {
+    const queryPlaylists = {
+      text: `SELECT playlists.id, playlists.name, users.username FROM playlists
+                LEFT JOIN users ON users.id = playlists.owner
+                WHERE playlists.id = $1`,
+      values: [playlistId],
+    };
+    const querySongs = {
+      text: `SELECT songs.id, songs.title, songs.performer FROM songs
+                JOIN playlist_songs ON songs.id = playlist_songs.song_id
+                WHERE playlist_songs.playlist_id = $1`,
+      values: [playlistId],
+    };
+    const resPlaylists = await this._pool.query(queryPlaylists);
+    const resSongs = await this._pool.query(querySongs);
+
+    return {
+      ...resPlaylists.rows[0],
+      songs: resSongs.rows,
+    };
   }
 }
 
