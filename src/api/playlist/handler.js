@@ -15,7 +15,7 @@ class PlaylistHandler {
       this._validator.validatePlaylistPayload(request.payload);
 
       const { name } = request.payload;
-      const { id: credentialId } = require.auth.credentials;
+      const { id: credentialId } = request.auth.credentials;
       const playlistId = await this._playlistService.addPlaylist({ name, owner: credentialId });
       const response = h.response({
         status: 'success',
@@ -199,8 +199,8 @@ class PlaylistHandler {
     try {
       const { playlistId } = request.params;
       const { id: credentialId } = request.auth.credentials;
-      await this._service.verifyPlaylistOwner(playlistId, credentialId);
-      await this._service.delPlaylistById(playlistId);
+      await this._playlistService.verifyPlaylistOwner(playlistId, credentialId);
+      await this._playlistService.delPlaylistById(playlistId);
       const response = h.response({
         status: 'success',
         message: 'Playlist berhasil terhapus',
