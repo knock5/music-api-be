@@ -1,4 +1,5 @@
 require('dotenv').config();
+
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
 const TokenManager = require('./tokenize/TokenManager');
@@ -8,24 +9,28 @@ const albums = require('./api/albums');
 const songs = require('./api/songs');
 const users = require('./api/users');
 const authentications = require('./api/authentication');
+const playlists = require('./api/playlist');
 
 // services
 const AlbumsService = require('./services/AlbumServices');
 const SongsService = require('./services/SongService');
 const UserService = require('./services/UserServices');
 const AuthenticationService = require('./services/AuthenticationService');
+const PlaylistsService = require('./services/PlaylistService');
 
 // validator
 const AlbumValidator = require('./validator/albums');
 const SongsValidator = require('./validator/songs');
 const UserValidator = require('./validator/users');
 const AuthenticationValidator = require('./validator/authentications');
+const PlaylistsValidator = require('./validator/playlists');
 
 const init = async () => {
   const songsService = new SongsService();
   const albumsService = new AlbumsService();
   const userService = new UserService();
   const authenticationsService = new AuthenticationService();
+  const playlistsService = new PlaylistsService();
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -90,6 +95,14 @@ const init = async () => {
         userService,
         tokenManager: TokenManager,
         validator: AuthenticationValidator,
+      },
+    },
+    {
+      plugin: playlists,
+      options: {
+        playlistsService,
+        songsService,
+        validator: PlaylistsValidator,
       },
     },
   ]);
