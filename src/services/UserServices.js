@@ -12,17 +12,20 @@ class UsersServices {
   }
 
   async addUser({ username, password, fullname }) {
+    // cek username apakah sudah terdaftar
     await this.verifyNewUsername(username);
-
+    // buat username baru jika belum ada
     const id = `user-${nanoid(16)}`;
     const hashedPassword = await bcrypt.hash(password, 10);
     const query = {
-      text: 'INSERT INTO users VALUES($1, $2, $3, $4) RETURNING id, username, password, fullname',
+      text: 'INSERT INTO users VALUES($1, $2, $3, $4) RETURNING id',
       values: [id, username, hashedPassword, fullname],
     };
-
     const result = await this._pool.query(query);
-    return result.rows[0];
+    if (!result.rows.length) {
+      throw new InvariantError('User tersebut gagal ditambahkan');
+    }
+    return result.rows[0].id;
   }
 
   async verifyNewUsername(username) {
@@ -36,13 +39,11 @@ class UsersServices {
     if (result.rows.length > 0) {
       throw new InvariantError('Gagal menambah user. Username sudah digunakan');
     }
-
-    return result.rows[0].id;
   }
 
   async getUserById(userId) {
     const query = {
-      text: 'SELCT id, username, fullname FROM users WHERE id = $1',
+      text: 'SELECT id, username, fullname FROM users WHERE id = $1',
       values: [userId],
     };
 
