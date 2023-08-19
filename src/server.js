@@ -3,6 +3,7 @@ require('dotenv').config();
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
 const TokenManager = require('./tokenize/TokenManager');
+const ClientError = require('./exceptions/ClientError');
 
 // plugins
 const albums = require('./api/albums');
@@ -106,6 +107,40 @@ const init = async () => {
       },
     },
   ]);
+
+  server.ext('onPreResponse', (request, h) => {
+    // mendapatkan konteks response dari request
+    const { response } = request;
+
+    if (response instanceof Error) {
+      // penanganan client error secara internal
+      if (response instanceof ClientError) {
+        const newResponse = h.response({
+          status: 'fail',
+          message: response.message,
+        });
+
+        newResponse.code(response.statusCode);
+        return newResponse;
+      }
+
+      if (!response.isServer) {
+        return h.continue;
+      }
+
+      // penanganan server error sesuai kebutuhan
+      const newResponse = h.response({
+        status: 'error',
+        message: 'Maaf, terjadi kesalahan pada server kami...',
+      });
+
+      newResponse.code(500);
+      return newResponse;
+    }
+
+    // jika bukan error, lanjutkan dengan response sebelumnya (tanpa terintervensi)
+    return h.continue;
+  });
 
   await server.start();
   console.log(`Server berjalan pada ${server.info.uri}`);
