@@ -49,7 +49,7 @@ const init = async () => {
     },
   ]);
 
-  // Mendefinisikan strategI autentikasi JWT
+  // Mendefinisikan strategi autentikasi JWT
   server.auth.strategy('openmusic_jwt', 'jwt', {
     keys: process.env.ACCESS_TOKEN_KEY,
     verify: {

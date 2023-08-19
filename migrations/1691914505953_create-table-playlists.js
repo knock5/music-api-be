@@ -14,7 +14,7 @@ exports.up = (pgm) => {
     owner: {
       type: 'TEXT',
       notNull: true,
-      refrences: 'user(id)',
+      references: 'user(id)',
       onDelete: 'CASCADE',
     },
   });
